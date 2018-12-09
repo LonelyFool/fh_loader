@@ -88,24 +88,16 @@ gcc fh_loader.c -o fh_loader -lrt
 
 ****************************************************************************/
 
-#include "stdafx.h"
-#include <windows.h>
-#include <direct.h>
-#include <io.h>
-#define GETCWD _getcwd
+#include "platform.h"
+
 #define ZLPAWAREHOST 1
 #define SLASH '\\'    // defined differently below for LINUX
 #define WRONGSLASH '/'
-#define O_RDWR _O_RDWR
-#define O_SYNC _O_SEQUENTIAL
-#define sleep(x) Sleep(x*1000)
 
 #define SIZE_T long long int
 #define SIZE_T_FORMAT "lld"    // Use in middle of string "Channel read "SIZE_T_FORMAT" bytes", at end of string "num_physical_partitions="SIZE_T_FORMAT
 #define SIZE_T_FORMAT4 ".4lld"
 #define SIZE_T_FORMAT5 ".5lld"
-#define fseek _fseeki64
-#define ftell _ftelli64
 
 
 
@@ -1367,7 +1359,7 @@ int retval;
 #ifdef _MSC_VER
 #define dbg(log_level, fmt, ...) MyLog(log_level, __FUNCTION__, __LINE__, fmt, __VA_ARGS__)
 #else
-//#define dbg(log_level, fmt ...) MyLog(log_level, __FUNCTION__, __LINE__, fmt)
+#define dbg(log_level, fmt ...) MyLog(log_level, __FUNCTION__, __LINE__, fmt)
 #endif
 
 unsigned int OpenPort(char *pData);
@@ -2556,11 +2548,11 @@ void DumpFFURawProgram(struct FFUImage_t * FFU)
 		// Increment our offset by number of blocks
 		if (BlockDataEntriesPtr->dwLocationCount > 0)
 		{
-			BlockDataEntriesPtr = (struct FFUBlockDataEntry_t *)((uint32_t)BlockDataEntriesPtr + (sizeof(struct FFUBlockDataEntry_t) + (BlockDataEntriesPtr->dwLocationCount - 1)*sizeof(struct FFUDiskLocation_t)));
+			BlockDataEntriesPtr = (struct FFUBlockDataEntry_t *)((size_t)BlockDataEntriesPtr + (sizeof(struct FFUBlockDataEntry_t) + (BlockDataEntriesPtr->dwLocationCount - 1)*sizeof(struct FFUDiskLocation_t)));
 		}
 		else
 		{
-			BlockDataEntriesPtr = (struct FFUBlockDataEntry_t *)((uint32_t)BlockDataEntriesPtr + sizeof(struct FFUBlockDataEntry_t));
+			BlockDataEntriesPtr = (struct FFUBlockDataEntry_t *)((size_t)BlockDataEntriesPtr + sizeof(struct FFUBlockDataEntry_t));
 		}
 		dwBlockOffset++;
 	}
@@ -7529,7 +7521,7 @@ void PossiblyShowContentsXMLDifferentFileFoundWarning(char *CurrentPathAndFilena
 char* find_file(char *filename, char ShowToScreen)
 {
 	SIZE_T i = 0;
-	struct _stat64 status_buf;
+	struct stat64 status_buf;
 	FILE *fj;
 
 	// for breakpoint only
@@ -10971,7 +10963,7 @@ int MyCopyFile(char *FileNameSource, char *FileNameDest)
 	FILE *f2;
 	//char FileBuffer[1024*1024]; // char temp_buffer[FIREHOSE_TX_BUFFER_SIZE];
 	SIZE_T BytesRead = 0, BytesWritten = 0;
-	struct _stat64 buf;
+	struct stat64 buf;
 
 	if (!ForceOverwrite)
 	{

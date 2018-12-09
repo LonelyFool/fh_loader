@@ -60,7 +60,7 @@ when         who   what, where, why
 
 ===========================================================================*/
 
-#include "stdafx.h"
+#include "platform.h"
 #include "fh_loader_sha.h"
 #include <string.h>
 
